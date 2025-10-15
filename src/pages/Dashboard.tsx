@@ -25,30 +25,28 @@ export default function Dashboard() {
     });
   };
 
-  // Sort devices: critical first, then by percent
+  // Ordena dispositivos por nível de carga
   const sortedDevices = [...data.devices].sort((a, b) => {
     const aPercent = a.currentPercent || 100;
     const bPercent = b.currentPercent || 100;
     return aPercent - bPercent;
   });
 
-  const criticalDevices = sortedDevices.filter(d => (d.currentPercent || 100) < 15);
-  const warningDevices = sortedDevices.filter(d => {
-    const p = d.currentPercent || 100;
-    return p >= 15 && p < 30;
-  });
-
   return (
     <div className="space-y-6 sm:space-y-8 p-4 sm:p-6">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">Dashboard</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">Visão geral do sistema IoT Balance</p>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Visão geral do sistema IoT Balance
+        </p>
       </div>
 
       <div className="space-y-6 sm:space-y-8">
-        {/* Stats Overview */}
+        {/* Seção: Visão Geral */}
         <div>
-          <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-bold tracking-tight">Visão Geral</h2>
+          <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-bold tracking-tight">
+            Visão Geral
+          </h2>
           <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <StatsCard
               title="Dispositivos Ativos"
@@ -81,17 +79,19 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Active Alerts */}
+        {/* Seção: Alertas Ativos */}
         {data.alerts.length > 0 && (
           <div className="mb-6 sm:mb-8">
             <div className="mb-4 sm:mb-6 flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Alertas Ativos</h2>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+                Alertas Ativos
+              </h2>
               <span className="text-xs sm:text-sm text-muted-foreground">
                 {data.alerts.length} alerta{data.alerts.length !== 1 ? 's' : ''}
               </span>
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
-              {data.alerts.map(alert => (
+              {data.alerts.map((alert) => (
                 <AlertCard
                   key={alert.id}
                   alert={alert}
@@ -102,62 +102,19 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Critical Devices */}
-        {criticalDevices.length > 0 && (
-          <div className="mb-6 sm:mb-8">
-            <div className="mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-danger">
-                Dispositivos Críticos
-              </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Nível abaixo de 15% - Reposição urgente necessária
-              </p>
-            </div>
-            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {criticalDevices.map(device => (
-                <DeviceCard
-                  key={device.id}
-                  device={device}
-                  onClick={() => handleDeviceClick(device.id)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Warning Devices */}
-        {warningDevices.length > 0 && (
-          <div className="mb-6 sm:mb-8">
-            <div className="mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-warning">
-                Dispositivos em Aviso
-              </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Nível entre 15% e 30% - Planejar reposição em breve
-              </p>
-            </div>
-            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {warningDevices.map(device => (
-                <DeviceCard
-                  key={device.id}
-                  device={device}
-                  onClick={() => handleDeviceClick(device.id)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* All Devices */}
+        {/* Seção: Todos os Dispositivos */}
         <div>
           <div className="mb-4 sm:mb-6 flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Todos os Dispositivos</h2>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+              Todos os Dispositivos
+            </h2>
             <span className="text-xs sm:text-sm text-muted-foreground">
-              {sortedDevices.length} dispositivo{sortedDevices.length !== 1 ? 's' : ''}
+              {sortedDevices.length} dispositivo
+              {sortedDevices.length !== 1 ? 's' : ''}
             </span>
           </div>
           <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {sortedDevices.map(device => (
+            {sortedDevices.map((device) => (
               <DeviceCard
                 key={device.id}
                 device={device}
