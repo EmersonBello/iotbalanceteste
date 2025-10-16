@@ -14,7 +14,6 @@ import {
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: Home },
-  { title: "Clientes", url: "/clients", icon: Building2 },
   { title: "Locais", url: "/locations", icon: MapPin },
   { title: "Zonas", url: "/zones", icon: Grid3x3 },
   { title: "Dispositivos", url: "/devices", icon: Activity },

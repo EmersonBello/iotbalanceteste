@@ -30,7 +30,7 @@ const DeviceDetailPage = () => {
   if (!device) {
     return (
       <div className="space-y-6">
-        <Link to="/dashboard/devices">
+        <Link to="/devices">
           <Button variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar
@@ -53,7 +53,7 @@ const DeviceDetailPage = () => {
 
   return (
     <div className="space-y-6">
-      <Link to="/dashboard/devices">
+      <Link to="/devices">
         <Button variant="outline">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar
