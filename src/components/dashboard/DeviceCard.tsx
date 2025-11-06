@@ -1,7 +1,8 @@
-import { AlertCircle, Battery, Radio, TrendingDown } from 'lucide-react';
+import { AlertCircle, Battery, Radio, TrendingDown, ExternalLink } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import type { Device } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -44,7 +45,7 @@ export function DeviceCard({ device, onClick }: DeviceCardProps) {
   return (
     <Card 
       className={cn(
-        "p-6 transition-all hover:shadow-lg cursor-pointer group",
+        "p-6 transition-all hover:shadow-lg cursor-pointer group relative",
         isLow && "ring-2 ring-warning/50"
       )}
       onClick={onClick}
@@ -64,9 +65,12 @@ export function DeviceCard({ device, onClick }: DeviceCardProps) {
             </p>
           </div>
           
-          {isLow && (
-            <AlertCircle className="h-5 w-5 text-warning animate-pulse-slow" />
-          )}
+          <div className="flex items-center gap-2">
+            {isLow && (
+              <AlertCircle className="h-5 w-5 text-warning animate-pulse-slow" />
+            )}
+            <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
         </div>
 
         {/* Progress Bar */}
@@ -106,6 +110,14 @@ export function DeviceCard({ device, onClick }: DeviceCardProps) {
         {/* Location */}
         <div className="pt-2 border-t text-xs text-muted-foreground">
           {device.currentContainer?.name}
+        </div>
+
+        {/* Click Hint */}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center justify-center text-xs text-muted-foreground pt-1">
+            <ExternalLink className="h-3 w-3 mr-1" />
+            <span>Clique para ver detalhes</span>
+          </div>
         </div>
       </div>
     </Card>

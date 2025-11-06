@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Activity, AlertCircle, Battery, TrendingDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { DeviceCard } from '@/components/dashboard/DeviceCard';
 import { AlertCard } from '@/components/dashboard/AlertCard';
@@ -8,22 +9,46 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [data] = useState(() => loadMockData());
+  const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<Set<string>>(new Set());
   const stats = getDashboardStats(data);
 
+  // Carrega alertas reconhecidos do localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('acknowledgedAlerts');
+    if (saved) {
+      setAcknowledgedAlerts(new Set(JSON.parse(saved)));
+    }
+  }, []);
+
+  // Salva alertas reconhecidos no localStorage
+  useEffect(() => {
+    localStorage.setItem('acknowledgedAlerts', JSON.stringify([...acknowledgedAlerts]));
+  }, [acknowledgedAlerts]);
+
   const handleAcknowledgeAlert = (alertId: string) => {
+    // Adiciona o alerta ao conjunto de reconhecidos
+    setAcknowledgedAlerts(prev => new Set([...prev, alertId]));
+    
     toast({
       title: "Alerta reconhecido",
-      description: "O alerta foi marcado como reconhecido.",
+      description: "O alerta foi marcado como reconhecido e será removido da lista.",
     });
   };
 
   const handleDeviceClick = (deviceId: string) => {
     toast({
-      title: "Abrindo detalhes",
-      description: "Visualização detalhada do dispositivo em breve.",
+      title: "Navegando para dispositivo",
+      description: "Redirecionando para página de detalhes do dispositivo.",
     });
+    
+    // Navega para a página de detalhes do dispositivo
+    navigate(`/devices/${deviceId}`);
   };
+
+  // Filtra apenas alertas não reconhecidos
+  const activeAlerts = data.alerts.filter(alert => !acknowledgedAlerts.has(alert.id));
 
   // Ordena dispositivos por nível de carga
   const sortedDevices = [...data.devices].sort((a, b) => {
@@ -57,7 +82,7 @@ export default function Dashboard() {
             />
             <StatsCard
               title="Alertas Críticos"
-              value={stats.criticalAlerts}
+              value={activeAlerts.filter(alert => alert.severity === 'critical').length}
               icon={AlertCircle}
               trend="Requer atenção imediata"
               variant="danger"
@@ -80,24 +105,45 @@ export default function Dashboard() {
         </div>
 
         {/* Seção: Alertas Ativos */}
-        {data.alerts.length > 0 && (
+        {activeAlerts.length > 0 && (
           <div className="mb-6 sm:mb-8">
             <div className="mb-4 sm:mb-6 flex items-center justify-between">
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
                 Alertas Ativos
               </h2>
               <span className="text-xs sm:text-sm text-muted-foreground">
-                {data.alerts.length} alerta{data.alerts.length !== 1 ? 's' : ''}
+                {activeAlerts.length} alerta{activeAlerts.length !== 1 ? 's' : ''} ativo
+                {activeAlerts.length !== 1 ? 's' : ''}
               </span>
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
-              {data.alerts.map((alert) => (
+              {activeAlerts.map((alert) => (
                 <AlertCard
                   key={alert.id}
                   alert={alert}
                   onAcknowledge={handleAcknowledgeAlert}
+                  isAcknowledged={acknowledgedAlerts.has(alert.id)}
                 />
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Mensagem quando não há alertas ativos */}
+        {activeAlerts.length === 0 && data.alerts.length > 0 && (
+          <div className="mb-6 sm:mb-8">
+            <div className="text-center py-8">
+              <div className="mb-4 flex justify-center">
+                <div className="rounded-full bg-success/10 p-4">
+                  <Activity className="h-8 w-8 text-success" />
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-success mb-2">
+                Nenhum alerta ativo
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Todos os alertas foram reconhecidos. Sistema operando normalmente.
+              </p>
             </div>
           </div>
         )}
