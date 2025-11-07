@@ -132,9 +132,10 @@ export function NotificationDropdown({
     onNotificationClick?.(notification);
   };
 
+  // Configuração de tela para Notifição
   const handleViewAllNotifications = () => {
     setIsOpen(false);
-    // Navegar para página de todas as notificações
+    // Navegar para página de configurações na aba de notificações
     window.location.href = "/settings";
   };
 
