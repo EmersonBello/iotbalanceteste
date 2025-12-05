@@ -319,3 +319,33 @@ export interface WeightDataPoint {
   weight: number;
   percent: number;
 }
+
+// Waiter Performance & Analytics
+export interface WaiterAction {
+  id: string;
+  waiterId: string;
+  waiterName: string;
+  alertId: string;
+  actionType: 'refill' | 'swap' | 'deactivate' | 'acknowledge';
+  actionAt: string;
+  responseTimeMinutes: number; // Time from alert opened to action taken
+}
+
+export interface WaiterPerformanceMetrics {
+  waiterId: string;
+  waiterName: string;
+  avgResponseTimeMinutes: number;
+  totalActions: number;
+  fastestResponseMinutes: number;
+  slowestResponseMinutes: number;
+}
+
+export interface AlertFrequencyData {
+  zoneId: string;
+  zoneName: string;
+  locationName: string;
+  alertCount: number;
+  criticalCount: number;
+  warningCount: number;
+  infoCount: number;
+}

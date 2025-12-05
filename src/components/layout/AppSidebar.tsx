@@ -1,4 +1,4 @@
-import { Building2, Package, Activity, BarChart3, Settings, Home, MapPin, Grid3x3 } from "lucide-react";
+import { Building2, Package, Activity, BarChart3, Settings, Home, MapPin, Grid3x3, Bell } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -14,6 +14,7 @@ import {
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: Home },
+  { title: "Notificações", url: "/notifications", icon: Bell },
   { title: "Locais", url: "/locations", icon: MapPin },
   { title: "Zonas", url: "/zones", icon: Grid3x3 },
   { title: "Dispositivos", url: "/devices", icon: Activity },
@@ -34,7 +35,7 @@ export function AppSidebar() {
           </div>
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>

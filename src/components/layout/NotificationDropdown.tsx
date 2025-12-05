@@ -75,7 +75,7 @@ const mockNotifications: Notification[] = [
   }
 ];
 
-export function NotificationDropdown({ 
+export function NotificationDropdown({
   alertCount,
   notifications = mockNotifications,
   onMarkAsRead,
@@ -102,7 +102,7 @@ export function NotificationDropdown({
 
   const handleMarkAsRead = (notificationId: string, event: React.MouseEvent) => {
     event.stopPropagation();
-    const updated = localNotifications.map(n => 
+    const updated = localNotifications.map(n =>
       n.id === notificationId ? { ...n, isRead: true } : n
     );
     setLocalNotifications(updated);
@@ -117,7 +117,7 @@ export function NotificationDropdown({
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.isRead) {
-      const updated = localNotifications.map(n => 
+      const updated = localNotifications.map(n =>
         n.id === notification.id ? { ...n, isRead: true } : n
       );
       setLocalNotifications(updated);
@@ -128,15 +128,24 @@ export function NotificationDropdown({
 
   const handleViewDetails = (notification: Notification, event: React.MouseEvent) => {
     event.stopPropagation();
-    // Não fecha o popover, apenas executa a ação
+    setIsOpen(false);
+
+    // Smart routing based on notification type
+    if (notification.actionUrl) {
+      // Navigate to the specific page
+      window.location.href = notification.actionUrl;
+    } else {
+      // Default to notifications page
+      window.location.href = '/notifications';
+    }
+
     onNotificationClick?.(notification);
   };
 
-  // Configuração de tela para Notifição
+  // Navigate to notifications page
   const handleViewAllNotifications = () => {
     setIsOpen(false);
-    // Navegar para página de configurações na aba de notificações
-    window.location.href = "/settings";
+    window.location.href = '/notifications';
   };
 
   return (
@@ -154,7 +163,7 @@ export function NotificationDropdown({
           )}
         </div>
       </PopoverTrigger>
-      
+
       <PopoverContent className="w-80 p-0" align="end">
         {/* Header */}
         <div className="p-3 border-b">
@@ -210,12 +219,12 @@ export function NotificationDropdown({
                   {!notification.isRead && (
                     <div className="absolute left-2 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-blue-500 rounded-full" />
                   )}
-                  
+
                   <div className="flex items-start gap-3 ml-4">
                     <div className="mt-0.5">
                       {getNotificationIcon(notification.type)}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className={cn(
@@ -225,13 +234,13 @@ export function NotificationDropdown({
                         )}>
                           {notification.title}
                         </h4>
-                        
+
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {notification.timestamp}
                           </span>
-                          
+
                           <Button
                             variant="ghost"
                             size="sm"
@@ -242,14 +251,14 @@ export function NotificationDropdown({
                           </Button>
                         </div>
                       </div>
-                      
+
                       <p className={cn(
                         "text-xs mt-1 leading-relaxed",
                         !notification.isRead ? "text-foreground" : "text-muted-foreground"
                       )}>
                         {notification.message}
                       </p>
-                      
+
                       {notification.actionUrl && (
                         <button
                           onClick={(e) => handleViewDetails(notification, e)}
@@ -270,8 +279,8 @@ export function NotificationDropdown({
         {/* Footer */}
         {localNotifications.length > 0 && (
           <div className="p-3 border-t bg-muted/20">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="w-full text-sm h-8 hover:bg-muted"
               onClick={handleViewAllNotifications}
             >

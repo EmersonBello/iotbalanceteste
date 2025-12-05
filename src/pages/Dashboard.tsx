@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { DeviceCard } from '@/components/dashboard/DeviceCard';
 import { AlertCard } from '@/components/dashboard/AlertCard';
-import { loadMockData, getDashboardStats } from '@/lib/mockData';
+import { WaiterRefillChart } from '@/components/dashboard/WaiterRefillChart';
+import { AlertFrequencyChart } from '@/components/dashboard/AlertFrequencyChart';
+import { loadMockData, getDashboardStats, getWaiterPerformanceMetrics, getAlertFrequencyByZone } from '@/lib/mockData';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Dashboard() {
@@ -30,7 +32,7 @@ export default function Dashboard() {
   const handleAcknowledgeAlert = (alertId: string) => {
     // Adiciona o alerta ao conjunto de reconhecidos
     setAcknowledgedAlerts(prev => new Set([...prev, alertId]));
-    
+
     toast({
       title: "Alerta reconhecido",
       description: "O alerta foi marcado como reconhecido e será removido da lista.",
@@ -42,7 +44,7 @@ export default function Dashboard() {
       title: "Navegando para dispositivo",
       description: "Redirecionando para página de detalhes do dispositivo.",
     });
-    
+
     // Navega para a página de detalhes do dispositivo
     navigate(`/devices/${deviceId}`);
   };
@@ -101,6 +103,17 @@ export default function Dashboard() {
               trend={`${stats.offlineDevices} offline`}
               variant="default"
             />
+          </div>
+        </div>
+
+        {/* Seção: Analytics de Performance */}
+        <div>
+          <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-bold tracking-tight">
+            Analytics de Performance
+          </h2>
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+            <WaiterRefillChart data={getWaiterPerformanceMetrics(data)} />
+            <AlertFrequencyChart data={getAlertFrequencyByZone(data)} />
           </div>
         </div>
 
