@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, X, ChevronRight, AlertTriangle, Info, CheckCircle, Clock } from "lucide-react";
 import {
   Popover,
@@ -126,6 +127,9 @@ export function NotificationDropdown({
     onNotificationClick?.(notification);
   };
 
+  // Previne refresh da página usando useNavigate
+  const navigate = useNavigate();
+
   const handleViewDetails = (notification: Notification, event: React.MouseEvent) => {
     event.stopPropagation();
     setIsOpen(false);
@@ -133,10 +137,10 @@ export function NotificationDropdown({
     // Smart routing based on notification type
     if (notification.actionUrl) {
       // Navigate to the specific page
-      window.location.href = notification.actionUrl;
+      navigate(notification.actionUrl);
     } else {
       // Default to notifications page
-      window.location.href = '/notifications';
+      navigate('/notifications');
     }
 
     onNotificationClick?.(notification);
@@ -145,7 +149,7 @@ export function NotificationDropdown({
   // Navigate to notifications page
   const handleViewAllNotifications = () => {
     setIsOpen(false);
-    window.location.href = '/notifications';
+    navigate('/notifications');
   };
 
   return (

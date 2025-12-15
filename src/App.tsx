@@ -15,31 +15,35 @@ import SettingsPage from "./pages/settings/SettingsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import NotFound from "./pages/NotFound";
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 const queryClient = new QueryClient();
 
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <TooltipProvider>
-          <Routes>
-            <Route path="/" element={<DashboardLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="notifications" element={<NotificationsPage />} />
-              <Route path="locations" element={<LocationsPage />} />
-              <Route path="zones" element={<ZonesPage />} />
-              <Route path="devices" element={<DevicesPage />} />
-              <Route path="devices/:id" element={<DeviceDetailPage />} />
-              <Route path="products" element={<ProductsPage />} />
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
-      </BrowserRouter>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme" attribute="class">
+        <BrowserRouter>
+          <TooltipProvider>
+            <Routes>
+              <Route path="/" element={<DashboardLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="notifications" element={<NotificationsPage />} />
+                <Route path="locations" element={<LocationsPage />} />
+                <Route path="zones" element={<ZonesPage />} />
+                <Route path="devices" element={<DevicesPage />} />
+                <Route path="devices/:id" element={<DeviceDetailPage />} />
+                <Route path="products" element={<ProductsPage />} />
+                <Route path="reports" element={<ReportsPage />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

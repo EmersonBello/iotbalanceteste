@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 
 const SettingsPage_COMPLETA = () => {
   const { toast } = useToast();
-  
+
   // Estados para notificações
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
@@ -49,19 +50,8 @@ const SettingsPage_COMPLETA = () => {
   const [newUser, setNewUser] = useState({ name: "", email: "", role: "Visualizador" });
   const [editingUser, setEditingUser] = useState(null);
 
-  // Estados para tema manual
-  const [manualTheme, setManualTheme] = useState(() => {
-    // Carregar preferência salva do localStorage
-    const savedTheme = localStorage.getItem('theme-preference');
-    return savedTheme || "auto";
-  });
-
-  // Carregar tema salvo na inicialização
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme-preference') || "auto";
-    setManualTheme(savedTheme);
-    if (devMode) console.log(`🔄 Tema carregado do localStorage: ${savedTheme}`);
-  }, []);
+  // Hook de tema do next-themes
+  const { theme, setTheme } = useTheme();
 
   // Ler parâmetro de URL para definir aba ativa
   const [activeTab, setActiveTab] = useState(() => {
@@ -81,66 +71,29 @@ const SettingsPage_COMPLETA = () => {
     window.history.replaceState({}, '', url.toString());
   }, [activeTab]);
 
-  // Funcionalidade: Tema Manual e Automático
-  const applyTheme = (theme) => {
-    const root = document.documentElement;
-    
-    if (theme === "dark") {
-      root.classList.add('dark');
-    } else if (theme === "light") {
-      root.classList.remove('dark');
-    } else {
-      // Auto mode - baseado no horário
-      const currentHour = new Date().getHours();
-      const shouldBeDark = currentHour >= 18 || currentHour < 6;
-      
-      if (shouldBeDark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-    }
-    
-    // Salvar preferência no localStorage
-    localStorage.setItem('theme-preference', theme);
-    if (devMode) console.log(`🎨 Tema aplicado: ${theme}`);
-  };
-
   // Funcionalidade: Tema Manual
-  useEffect(() => {
-    if (manualTheme === "light") {
-      applyTheme("light");
-    } else if (manualTheme === "dark") {
-      applyTheme("dark");
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+
+    if (newTheme === "light") {
+      toast({
+        title: "Tema Claro Ativado",
+        description: "Interface alterada para o tema claro.",
+      });
+    } else if (newTheme === "dark") {
+      toast({
+        title: "Tema Escuro Ativado",
+        description: "Interface alterada para o tema escuro.",
+      });
     } else {
-      // Auto mode - com verificação a cada minuto
-      applyTheme("auto");
+      toast({
+        title: "Tema Automático Ativado",
+        description: "Tema será sincronizado com as preferências do sistema.",
+      });
     }
-  }, [manualTheme, autoDarkMode]);
 
-  // Funcionalidade: Tema Escuro Automático
-  useEffect(() => {
-    if (autoDarkMode && manualTheme === "auto") {
-      const checkTimeAndApplyTheme = () => {
-        const currentHour = new Date().getHours();
-        const shouldBeDark = currentHour >= 18 || currentHour < 6; // 18h-6h
-        
-        if (shouldBeDark) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      };
-
-      // Aplicar tema na inicialização
-      checkTimeAndApplyTheme();
-
-      // Verificar a cada minuto
-      const interval = setInterval(checkTimeAndApplyTheme, 60000);
-
-      return () => clearInterval(interval);
-    }
-  }, [autoDarkMode, manualTheme]);
+    if (devMode) console.log(`🎨 Tema alterado para: ${newTheme}`);
+  };
 
   // Funcionalidade: Modo de Desenvolvimento
   useEffect(() => {
@@ -148,13 +101,13 @@ const SettingsPage_COMPLETA = () => {
       // Habilitar logs detalhados e recursos de debug
       console.log('🔧 Modo de Desenvolvimento ATIVADO');
       console.log('📊 Sistema IoT Balance - Debug Mode');
-      
+
       // Simular logs de debug para dispositivos
       const mockDevices = [
         { id: 'HX711-001', status: 'online', battery: 15, lastSeen: '2 min atrás' },
         { id: 'ESP32-003', status: 'offline', battery: 87, lastSeen: '15 min atrás' }
       ];
-      
+
       console.table(mockDevices);
     }
   }, [devMode]);
@@ -176,7 +129,7 @@ const SettingsPage_COMPLETA = () => {
       timezone,
       language
     };
-    
+
     localStorage.setItem('iot-balance-settings', JSON.stringify(settings));
   }, [emailNotifications, smsNotifications, criticalAlerts, warningAlerts, dailyReport, notificationEmail, notificationPhone, autoDarkMode, devMode, companyName, timezone, language]);
 
@@ -207,7 +160,7 @@ const SettingsPage_COMPLETA = () => {
   const handleSave = (section: string) => {
     // Salvar configurações e exibir feedback
     const timestamp = new Date().toLocaleString('pt-BR', { timeZone: timezone });
-    
+
     toast({
       title: "Configurações salvas",
       description: `As configurações de ${section} foram atualizadas com sucesso. ${devMode ? `[Debug: ${timestamp}]` : ''}`,
@@ -233,20 +186,8 @@ const SettingsPage_COMPLETA = () => {
   // Função específica para alternar tema escuro automático
   const handleAutoDarkModeToggle = (enabled: boolean) => {
     setAutoDarkMode(enabled);
-    
     if (enabled) {
-      toast({
-        title: "Tema Escuro Automático Ativado",
-        description: "O tema será alternado automaticamente baseado no horário (18h-6h).",
-      });
-    } else {
-      toast({
-        title: "Tema Escuro Automático Desativado",
-        description: "O tema será controlado manualmente.",
-      });
-      
-      // Remover tema escuro se estava ativo
-      document.documentElement.classList.remove('dark');
+      handleThemeChange("system");
     }
   };
 
@@ -308,7 +249,7 @@ const SettingsPage_COMPLETA = () => {
     setUsers([...users, newUserData]);
     setNewUser({ name: "", email: "", role: "Visualizador" });
     setShowAddUserForm(false);
-    
+
     toast({
       title: "Usuário adicionado",
       description: `${newUserData.name} foi adicionado com sucesso.`,
@@ -325,7 +266,7 @@ const SettingsPage_COMPLETA = () => {
     if (!userToRemove) return;
 
     setUsers(users.filter(user => user.id !== userId));
-    
+
     toast({
       title: "Usuário removido",
       description: `${userToRemove.name} foi removido do sistema.`,
@@ -338,14 +279,14 @@ const SettingsPage_COMPLETA = () => {
 
   // Função para editar usuário
   const handleEditUser = (userId: number, updatedData: any) => {
-    setUsers(users.map(user => 
-      user.id === userId 
+    setUsers(users.map(user =>
+      user.id === userId
         ? { ...user, ...updatedData }
         : user
     ));
-    
+
     setEditingUser(null);
-    
+
     toast({
       title: "Usuário atualizado",
       description: `Os dados de ${updatedData.name} foram atualizados.`,
@@ -358,41 +299,19 @@ const SettingsPage_COMPLETA = () => {
 
   // Função para alternar status do usuário
   const handleToggleUserStatus = (userId: number) => {
-    setUsers(users.map(user => 
-      user.id === userId 
+    setUsers(users.map(user =>
+      user.id === userId
         ? { ...user, status: user.status === "Ativo" ? "Inativo" : "Ativo" }
         : user
     ));
-    
+
     toast({
       title: "Status atualizado",
       description: "Status do usuário foi alterado.",
     });
   };
 
-  // === FUNCIONALIDADES DE TEMA ===
 
-  // Função para alternar tema manual
-  const handleThemeChange = (theme: string) => {
-    setManualTheme(theme);
-    
-    if (theme === "light") {
-      toast({
-        title: "Tema Claro Ativado",
-        description: "Interface alterada para o tema claro.",
-      });
-    } else if (theme === "dark") {
-      toast({
-        title: "Tema Escuro Ativado",
-        description: "Interface alterada para o tema escuro.",
-      });
-    } else {
-      toast({
-        title: "Tema Automático Ativado",
-        description: "Tema será alternado automaticamente baseado no horário.",
-      });
-    }
-  };
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
@@ -406,12 +325,12 @@ const SettingsPage_COMPLETA = () => {
         )}
       </div>
 
-      <Tabs 
-        value={activeTab} 
-        onValueChange={setActiveTab} 
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
+        <TabsList className="flex flex-wrap w-full h-auto gap-2 sm:grid sm:grid-cols-5">
           <TabsTrigger value="general">
             <Settings className="h-4 w-4 mr-2 hidden sm:inline" />
             Geral
@@ -443,14 +362,14 @@ const SettingsPage_COMPLETA = () => {
               <div className="space-y-4">
                 <h4 className="font-medium text-base">ℹ️ Observação: Fuso Horário e Idioma</h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Estas configurações são informativas e afetam principalmente a exibição de datas e horários no sistema, 
+                  Estas configurações são informativas e afetam principalmente a exibição de datas e horários no sistema,
                   bem como a formatação de números e valores monetários.
                 </p>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="company-name">Nome da Empresa</Label>
-                  <Input 
-                    id="company-name" 
+                  <Input
+                    id="company-name"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="Nome da sua empresa"
@@ -459,8 +378,8 @@ const SettingsPage_COMPLETA = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Fuso Horário</Label>
-                  <Input 
-                    id="timezone" 
+                  <Input
+                    id="timezone"
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
                     placeholder="America/São Paulo"
@@ -474,8 +393,8 @@ const SettingsPage_COMPLETA = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="language">Idioma</Label>
-                  <Input 
-                    id="language" 
+                  <Input
+                    id="language"
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                     placeholder="Português (Brasil)"
@@ -494,7 +413,7 @@ const SettingsPage_COMPLETA = () => {
               <div className="space-y-4">
                 <h4 className="font-medium text-base">Configurações do Sistema</h4>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="space-y-0.5">
                     <Label>ℹ️ Observação: Modo de Desenvolvimento</Label>
                     <p className="text-sm text-muted-foreground">
@@ -504,27 +423,27 @@ const SettingsPage_COMPLETA = () => {
                       ℹ️ <strong>Observação:</strong> Recomendado apenas para ambiente de desenvolvimento e testes
                     </p>
                   </div>
-                  <Switch 
+                  <Switch
                     checked={devMode}
                     onCheckedChange={setDevMode}
                   />
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="space-y-0.5">
                     <Label>🎯 Ação ao Selecionar: Tema Escuro Automático</Label>
                     <p className="text-sm text-muted-foreground">
-                      Alterna entre claro e escuro baseado no horário (18h-6h) {autoDarkMode ? '• ATIVO' : ''}
+                      Sincroniza com as preferências do sistema operacional
                     </p>
-                    {autoDarkMode && (
+                    {theme === 'system' && (
                       <p className="text-xs text-blue-600">
-                        🔄 Tema atual: {document.documentElement.classList.contains('dark') ? 'Escuro' : 'Claro'}
+                        🔄 Ativo
                       </p>
                     )}
                   </div>
-                  <Switch 
-                    checked={autoDarkMode}
-                    onCheckedChange={handleAutoDarkModeToggle}
+                  <Switch
+                    checked={theme === 'system'}
+                    onCheckedChange={(checked) => handleThemeChange(checked ? 'system' : 'light')}
                   />
                 </div>
 
@@ -532,12 +451,12 @@ const SettingsPage_COMPLETA = () => {
                 <div className="space-y-3">
                   <Label>🎨 Controle de Tema Manual</Label>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Defina o tema da interface manualmente ou mantenha automático
+                    Defina o tema da interface
                   </p>
-                  
-                  <div className="flex gap-2">
+
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
-                      variant={manualTheme === "light" ? "default" : "outline"}
+                      variant={theme === "light" ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleThemeChange("light")}
                       className="flex-1"
@@ -545,7 +464,7 @@ const SettingsPage_COMPLETA = () => {
                       ☀️ Claro
                     </Button>
                     <Button
-                      variant={manualTheme === "dark" ? "default" : "outline"}
+                      variant={theme === "dark" ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleThemeChange("dark")}
                       className="flex-1"
@@ -553,17 +472,17 @@ const SettingsPage_COMPLETA = () => {
                       🌙 Escuro
                     </Button>
                     <Button
-                      variant={manualTheme === "auto" ? "default" : "outline"}
+                      variant={theme === "system" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => handleThemeChange("auto")}
+                      onClick={() => handleThemeChange("system")}
                       className="flex-1"
                     >
                       🔄 Auto
                     </Button>
                   </div>
-                  
+
                   <p className="text-xs text-muted-foreground">
-                    📝 <strong>Status:</strong> Tema atual é {manualTheme}, {document.documentElement.classList.contains('dark') ? 'escuro' : 'claro'} está aplicado
+                    📝 <strong>Status:</strong> Tema selecionado: {theme}
                   </p>
                 </div>
               </div>
@@ -585,7 +504,7 @@ const SettingsPage_COMPLETA = () => {
               <Bell className="h-5 w-5" />
               Preferências de Notificação
             </h3>
-            
+
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <h4 className="font-medium text-blue-900 mb-2">✅ Verificação de Funcionalidade</h4>
               <p className="text-sm text-blue-800 mb-2">
@@ -664,16 +583,16 @@ const SettingsPage_COMPLETA = () => {
               <div className="space-y-2">
                 <Label htmlFor="email">E-mail para Notificações</Label>
                 <div className="flex gap-2">
-                  <Input 
-                    id="email" 
-                    type="email" 
+                  <Input
+                    id="email"
+                    type="email"
                     value={notificationEmail}
                     onChange={(e) => setNotificationEmail(e.target.value)}
-                    placeholder="admin@empresa.com" 
+                    placeholder="admin@empresa.com"
                     className="flex-1"
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => handleTestNotification('email')}
                     disabled={!emailNotifications}
@@ -687,16 +606,16 @@ const SettingsPage_COMPLETA = () => {
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefone para SMS</Label>
                 <div className="flex gap-2">
-                  <Input 
-                    id="phone" 
-                    type="tel" 
+                  <Input
+                    id="phone"
+                    type="tel"
                     value={notificationPhone}
                     onChange={(e) => setNotificationPhone(e.target.value)}
-                    placeholder="+55 11 99999-9999" 
+                    placeholder="+55 11 99999-9999"
                     className="flex-1"
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => handleTestNotification('sms')}
                     disabled={!smsNotifications}
@@ -724,16 +643,16 @@ const SettingsPage_COMPLETA = () => {
               <Shield className="h-5 w-5" />
               Segurança e Privacidade
             </h3>
-            
+
             {/* Observação sobre utilidade e funcionalidade */}
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
               <h4 className="font-medium text-orange-900 mb-2">📋 Observação de Utilidade e Funcionalidade</h4>
               <p className="text-sm text-orange-800 mb-2">
-                <strong>Utilidade:</strong> Esta seção permite configurar medidas de segurança que protegem o sistema IoT Balance 
+                <strong>Utilidade:</strong> Esta seção permite configurar medidas de segurança que protegem o sistema IoT Balance
                 contra acesso não autorizado, garante a integridade dos dados e permite o controle de sessões ativas dos usuários.
               </p>
               <p className="text-sm text-orange-800">
-                <strong>Funcionalidade:</strong> As configurações afetam diretamente o nível de segurança do sistema, 
+                <strong>Funcionalidade:</strong> As configurações afetam diretamente o nível de segurança do sistema,
                 incluindo autenticação, gerenciamento de senhas e monitoramento de sessões ativas.
               </p>
             </div>
@@ -816,16 +735,16 @@ const SettingsPage_COMPLETA = () => {
               <Database className="h-5 w-5" />
               Integrações e APIs
             </h3>
-            
+
             {/* Observação sobre utilidade e funcionalidade */}
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
               <h4 className="font-medium text-green-900 mb-2">📋 Observação de Utilidade e Funcionalidade</h4>
               <p className="text-sm text-green-800 mb-2">
-                <strong>Utilidade:</strong> Esta seção permite conectar o sistema IoT Balance com serviços externos, 
+                <strong>Utilidade:</strong> Esta seção permite conectar o sistema IoT Balance com serviços externos,
                 habilitar o envio de notificações automatizadas e gerenciar chaves de API para integração com outros sistemas.
               </p>
               <p className="text-sm text-green-800">
-                <strong>Funcionalidade:</strong> As integrações habilitam comunicação bidirecional com sistemas externos, 
+                <strong>Funcionalidade:</strong> As integrações habilitam comunicação bidirecional com sistemas externos,
                 permitem automação de processos e extensão das funcionalidades do sistema através de APIs.
               </p>
             </div>
@@ -850,8 +769,8 @@ const SettingsPage_COMPLETA = () => {
                       ) : (
                         <Badge variant="secondary">Pendente</Badge>
                       )}
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => {
                           setSmtpConfigured(!smtpConfigured);
@@ -879,8 +798,8 @@ const SettingsPage_COMPLETA = () => {
                       ) : (
                         <Badge variant="secondary">Pendente</Badge>
                       )}
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => {
                           setWebhookConfigured(!webhookConfigured);
@@ -924,21 +843,21 @@ const SettingsPage_COMPLETA = () => {
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
               <h4 className="font-medium text-purple-900 mb-2">📋 Observação de Utilidade e Funcionalidade</h4>
               <p className="text-sm text-purple-800 mb-2">
-                <strong>Utilidade:</strong> Esta seção permite gerenciar usuários do sistema, definir permissões e papéis, 
+                <strong>Utilidade:</strong> Esta seção permite gerenciar usuários do sistema, definir permissões e papéis,
                 e controlar o acesso às funcionalidades do IoT Balance conforme a necessidade organizacional.
               </p>
               <p className="text-sm text-purple-800">
-                <strong>Funcionalidade:</strong> O gerenciamento de usuários determina quais ações cada pessoa pode realizar no sistema, 
+                <strong>Funcionalidade:</strong> O gerenciamento de usuários determina quais ações cada pessoa pode realizar no sistema,
                 desde visualização de dados até administração completa, garantindo segurança e organização.
               </p>
             </div>
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Users className="h-5 w-5" />
                 Gerenciamento de Usuários ({users.length})
               </h3>
-              <Button onClick={() => setShowAddUserForm(true)}>
+              <Button onClick={() => setShowAddUserForm(true)} className="w-full sm:w-auto">
                 <Users className="mr-2 h-4 w-4" />
                 Adicionar Usuário
               </Button>
@@ -1004,56 +923,58 @@ const SettingsPage_COMPLETA = () => {
             {/* Lista de Usuários */}
             <div className="space-y-3">
               {users.map((user) => (
-                <div key={user.id} className="flex justify-between items-center p-4 border rounded-lg hover:bg-muted/30 transition-colors">
-                  <div className="flex-1">
+                <div key={user.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border rounded-lg hover:bg-muted/30 transition-colors gap-4">
+                  <div className="flex-1 w-full sm:w-auto">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                         <Users className="h-4 w-4 text-primary" />
                       </div>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                      <div className="overflow-hidden">
+                        <p className="font-medium truncate">{user.name}</p>
+                        <p className="text-sm text-muted-foreground truncate">{user.email}</p>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Badge 
-                      variant={user.role === "Administrador" ? "default" : "secondary"}
-                      className={user.status === "Inativo" ? "opacity-50" : ""}
-                    >
-                      {user.role}
-                    </Badge>
-                    <Badge 
-                      variant={user.status === "Ativo" ? "default" : "outline"}
-                      className={user.status === "Ativo" ? "text-green-600" : "text-red-600"}
-                    >
-                      {user.status}
-                    </Badge>
-                    
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                    <div className="flex gap-2">
+                      <Badge
+                        variant={user.role === "Administrador" ? "default" : "secondary"}
+                        className={user.status === "Inativo" ? "opacity-50" : ""}
+                      >
+                        {user.role}
+                      </Badge>
+                      <Badge
+                        variant={user.status === "Ativo" ? "default" : "outline"}
+                        className={user.status === "Ativo" ? "text-green-600" : "text-red-600"}
+                      >
+                        {user.status}
+                      </Badge>
+                    </div>
+
                     {/* Ações do usuário */}
                     <div className="flex gap-1">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => handleToggleUserStatus(user.id)}
                         title={user.status === "Ativo" ? "Desativar usuário" : "Ativar usuário"}
                       >
                         {user.status === "Ativo" ? "🔒" : "🔓"}
                       </Button>
-                      
-                      <Button 
-                        variant="outline" 
+
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => setEditingUser(user)}
                         title="Editar usuário"
                       >
                         ✏️
                       </Button>
-                      
+
                       {user.id !== 1 && ( // Não permite remover o admin principal
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => handleRemoveUser(user.id)}
                           title="Remover usuário"
@@ -1095,17 +1016,18 @@ const SettingsPage_COMPLETA = () => {
                       <option value="Administrador">Administrador - Controle total</option>
                     </select>
                   </div>
-                  <div className="flex gap-2">
-                    <Button 
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
                       onClick={() => handleEditUser(editingUser.id, {
                         name: editingUser.name,
                         role: editingUser.role
                       })}
+                      className="w-full sm:w-auto"
                     >
                       <CheckCircle2 className="mr-2 h-4 w-4" />
                       Salvar Alterações
                     </Button>
-                    <Button variant="outline" onClick={() => setEditingUser(null)}>
+                    <Button variant="outline" onClick={() => setEditingUser(null)} className="w-full sm:w-auto">
                       Cancelar
                     </Button>
                   </div>
