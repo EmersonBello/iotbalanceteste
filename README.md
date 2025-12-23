@@ -1,72 +1,143 @@
-# Bem vindo a seu projeto Lovable
-## Project info
+# IoT Balance - Sistema de Gestão para Bar
 
-**URL**: https://lovable.dev/projects/56759298-97bb-4044-9292-bc08372cef8d
+## Breve Descrição
+O **IoT Balance** é um sistema web inovador desenvolvido para monitoramento inteligente e gestão de estoque em tempo real, focado nas necessidades de estabelecimentos do tipo "Bar". A solução permite o controle preciso de volumes de bebidas (barris, garrafas) através de sensores IoT, garantindo eficiência operacional e redução de desperdícios.
 
-## How can I edit this code?
+## Objetivo do Projeto
+### Finalidade do Sistema
+Prover uma interface centralizada e intuitiva para o monitoramento de ativos (bebidas), gestão de dispositivos de pesagem e automação de alertas de reposição.
 
-There are several ways of editing your application.
+### Problema que ele resolve
+Elimina a necessidade de verificação manual de estoque, previne a falta de produtos em momentos críticos e fornece dados precisos sobre o consumo real, mitigando perdas e fraudes.
 
-**Use Lovable**
+## Público-Alvo
+- **Desenvolvedores de T.I:** Para manutenção, escalabilidade e integração com novos dispositivos IoT.
+- **Equipe de manutenção:** Responsável pela instalação física dos sensores e calibração das balanças.
+- **Cliente (Bar):** Gerentes e proprietários que utilizam os relatórios e o dashboard para tomada de decisão.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/56759298-97bb-4044-9292-bc08372cef8d) and start prompting.
+## Tecnologias Utilizadas
+### Linguagens
+- **TypeScript:** Tipagem estática para maior segurança e produtividade.
+- **JavaScript (ES6+):** Lógica de script auxiliar.
+- **HTML5 & CSS3:** Estruturação e estilização moderna.
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frameworks & Bibliotecas
+- **React:** Biblioteca principal para construção da interface de usuário.
+- **Vite:** Build tool de próxima geração, garantindo performance e HMR (Hot Module Replacement) rápido.
+- **Shadcn UI:** Componentes de interface reutilizáveis e acessíveis.
+- **Tailwind CSS:** Framework de utilitários CSS para estilização ágil.
+- **TanStack Query (React Query):** Gerenciamento de estado e requisições assíncronas.
+- **React Router DOM:** Gerenciamento de rotas da aplicação.
+- **Recharts:** Biblioteca para construção de gráficos e relatórios visuais.
 
-**Use your preferred IDE**
+### Ferramentas
+- **Node.js:** Ambiente de execução JavaScript server-side (utilizado para build e desenvolvimento).
+- **npm:** Gerenciador de pacotes.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Requisitos para Execução
+Para rodar este projeto localmente, é necessário ter instalado:
+- **Node.js** (Versão 18 ou superior recomendada)
+Link para download: https://nodejs.org/pt-br/download
+- **npm** (Normalmente instalado junto com o Node.js)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Instalação e Execução
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### 1. Clone do repositório
+```bash
+git https://github.com/EmersonBello/iotbalanceteste.git
+cd iotbalanceteste
 ```
 
-**Edit a file directly in GitHub**
+### 2. Instalação das dependências
+Execute o comando abaixo para instalar todas as bibliotecas necessárias listadas no `package.json`:
+```bash
+npm install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 3. Comando para rodar o projeto
+Para iniciar o servidor de desenvolvimento:
+```bash
+npm run dev
+```
+Logo após, o comado escolhe H + enter, depois O + enter, e finalmete irá abrir automaticamente no seu navegador padrão.
+O console exibirá o endereço local (geralmente `http://localhost:8082`) para acesso ao sistema.
 
-**Use GitHub Codespaces**
+## Arquitetura do Sistema
+### Descrição da arquitetura adotada
+O sistema segue uma arquitetura **Single Page Application (SPA)** baseada em componentes funcionais do React. A comunicação com o backend (IoT/Dados) é gerenciada via APIs RESTful/WebSockets, abstraída pelo TanStack Query para garantir cache e sincronização eficiente.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Separação de responsabilidades
+- **Components (`/src/components`):** Elementos visuais reutilizáveis (botões, cards, layouts).
+- **Pages (`/src/pages`):** Vistas principais da aplicação (Dashboard, Clientes, Produtos).
+- **Hooks (`/src/hooks`):** Lógica de negócios encapsulada e reutilizável.
+- **Types (`/src/types`):** Definições de tipos TypeScript para consistência de dados.
+- **Lib (`/src/lib`):** Utilitários e configurações globais.
 
-## What technologies are used for this project?
+### Boas práticas aplicadas
+- **Componentização:** Interface modular e de fácil manutenção.
+- **Clean Code:** Nomenclatura clara e funções com responsabilidade única.
+- **Tipagem Estrita:** Uso intensivo de TypeScript para evitar erros em tempo de execução.
+- **Design Responsivo:** Layout adaptável para dispositivos móveis e desktop.
 
-This project is built with:
+## Estrutura de Pastas
+```text
+iotbalanceteste/
+├── public/              # Arquivos estáticos públicos
+├── src/
+│   ├── components/      # Componentes de UI (Layout, Common, Shadcn)
+│   ├── hooks/           # Custom React Hooks
+│   ├── lib/             # Funções utilitárias e configurações
+│   ├── pages/           # Páginas da aplicação (Rotas)
+│   │   ├── Dashboard/
+│   │   ├── Devices/
+│   │   ├── Products/
+│   │   └── ...
+│   ├── types/           # Interfaces e tipos TypeScript
+│   ├── App.tsx          # Componente raiz
+│   └── main.tsx         # Ponto de entrada da aplicação
+├── package.json         # Dependências e scripts do projeto
+├── tsconfig.json        # Configurações do TypeScript
+├── vite.config.ts       # Configurações do Vite
+└── README.md            # Documentação do projeto
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Funcionalidades do Sistema
+- **Dashboard em Tempo Real:** Visão geral do status de todos os borrachas e dispositivos.
+- **Gestão de Dispositivos:** Cadastro, edição e monitoramento de dispositivos IoT.
+- **Gestão de Produtos:** Catálogo de bebidas e insumos monitorados.
+- **Sistema de Alertas:** Notificações visuais para níveis críticos de estoque.
+- **Relatórios:** Gráficos históricos de consumo e reposição.
+- **Gestão de Localizações:** Organização de dispositivos por zonas e locais físicos no bar.
 
-## How can I deploy this project?
+## Requisitos Funcionais
+- O sistema deve permitir o cadastro de novos dispositivos de pesagem.
+- O sistema deve exibir o peso/nível atual de cada borracha conectada.
+- O sistema deve alertar o usuário quando o nível de um produto estiver abaixo do mínimo configurado.
+- O sistema deve gerar relatórios de consumo por período.
 
-Simply open [Lovable](https://lovable.dev/projects/56759298-97bb-4044-9292-bc08372cef8d) and click on Share -> Publish.
+## Requisitos Não Funcionais
+### Desempenho
+- O dashboard deve carregar em menos de 2 segundos.
+- As atualizações de peso devem refletir na tela com latência mínima (real-time).
 
-## Can I connect a custom domain to my Lovable project?
+### Segurança
+- Acesso restrito via autenticação (login/senha).
+- Comunicação segura com os dispositivos IoT.
 
-Yes, you can!
+### Manutenibilidade
+- Código modular e tipado para facilitar atualizações e correções.
+- Documentação clara das APIs e componentes.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Relatório de Desenvolvimento
+### Etapas já desenvolvidas
+- [x] Configuração inicial do ambiente e arquitetura.
+- [x] Implementação dos componentes base (UI Kit).
+- [x] Desenvolvimento do Dashboard principal.
+- [x] Telas de gestão de Clientes, Produtos e Dispositivos.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Estado atual do projeto
+O projeto encontra-se em estágio avançado de **Desenvolvimento/Testes**, com as principais funcionalidades de monitoramento já implementadas e funcionais. O foco atual é refinamento de interface e otimização de performance.
+
+### Pontos de melhoria futuros
+- Implementação de testes automatizados.
+- Dashboard preditivo utilizando Machine Learning para estimar fim do estoque.
